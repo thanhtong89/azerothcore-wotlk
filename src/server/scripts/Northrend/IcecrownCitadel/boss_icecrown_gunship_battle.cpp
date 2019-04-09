@@ -2415,7 +2415,7 @@ class spell_igb_incinerating_blast : public SpellScriptLoader
                 GetExplTargetDest()->GetPosition(&dest);
                 targets.SetDst(dest);
                 CustomSpellValues values;
-                int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
+                int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8000;
                 values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
                 values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
                 values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
