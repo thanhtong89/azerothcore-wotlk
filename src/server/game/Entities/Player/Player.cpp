@@ -5865,6 +5865,9 @@ float Player::GetMeleeCritFromAgility()
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_AGILITY)*critRatio->ratio;
+    // cap melee crit for levels > 80
+    if (level > 80 && crit > .70f)
+	crit = .70f;
     return crit*100.0f;
 }
 
@@ -5935,6 +5938,10 @@ float Player::GetSpellCritFromIntellect()
         return 0.0f;
 
     float crit=critBase->base + GetStat(STAT_INTELLECT)*critRatio->ratio;
+    // cap crit for levels > 80
+    if (level > 80 && if crit > .70f)
+   	crit = .70f; 
+
     return crit*100.0f;
 }
 
