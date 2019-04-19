@@ -163,7 +163,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
     uint8 level = getLevel();
     m_baseSpellPower = 0;
     if (level > 80) {
-        ApplySpellPowerBonus(1.8 * GetStat(STAT_INTELLECT), true);
+        ApplySpellPowerBonus(.9 * GetStat(STAT_INTELLECT), true);
     }
 
     // Get healing bonus for all schools
