@@ -8,6 +8,7 @@ apps/drassil/*
 env/dist/*
 env/user/*
 modules/*
+!modules/bot
 !modules/*.md
 !modules/*.sh
 build*/
