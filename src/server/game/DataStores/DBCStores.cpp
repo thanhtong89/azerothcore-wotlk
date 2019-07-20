@@ -37,6 +37,7 @@ struct WMOAreaTableTripple
 };
 
 typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
+typedef std::multimap<uint32, CharSectionsEntry const*> CharSectionsMap;
 
 DBCStorage <AreaTableEntry> sAreaTableStore(AreaTableEntryfmt);
 DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
@@ -52,6 +53,9 @@ DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEnt
 DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryfmt);
 DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
 DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
+DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
+CharSectionsMap sCharSectionMap;
+
 std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
 DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);

@@ -240,6 +240,7 @@ class Group
         GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
         void ChangeMembersGroup(uint64 guid, uint8 group);
+        uint64 GetTargetIcon(uint8 id);
         void SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid);
         void SetGroupMemberFlag(uint64 guid, bool apply, GroupMemberFlags flag);
         void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
@@ -289,6 +290,10 @@ class Group
 
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
+
+	// ai playerbot mod
+	uint64 GetTargetIcon(int index) { return m_targetIcons[index]; }
+	Rolls* GetRolls() { return &RollId; }
 
         // LFG
         void AddLfgBuffFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_APPLY_RANDOM_BUFF; }

@@ -1335,3 +1335,14 @@ void WorldSession::InitWarden(BigNumber* k, std::string const& os)
         // _warden->Init(this, k);
     }
 }
+
+// playerbot mod
+void WorldSession::HandleBotPackets()
+{
+        WorldPacket* packet;
+        while (_recvQueue.next(packet))
+        {
+                OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+                (this->*opHandle.handler)(*packet);
+        }
+} 
