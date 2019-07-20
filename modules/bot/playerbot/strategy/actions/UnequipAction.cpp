@@ -3,6 +3,7 @@
 #include "UnequipAction.h"
 
 #include "../values/ItemCountValue.h"
+#include "Opcodes.h"
 
 using namespace BotAI;
 

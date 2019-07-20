@@ -5,6 +5,43 @@
 #include <cctype>
 #include <locale>
 
+// store absolute bit position for first rank for talent inspect
+static uint32 sTalentTabPages[MAX_CLASSES][3];
+static bool sTalentTabPagesInitialized;
+
+
+// prepare fast data access to bit pos of talent ranks for use at inspecting
+void initializeTalentTabPages() {
+    if (sTalentTabPagesInitialized) {
+        return;
+}
+		// now have all max ranks (and then bit amount used for store talent ranks in inspect)
+                for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
+		{
+                        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
+                        if (!talentTabInfo)
+                            continue;
+			// prevent memory corruption; otherwise cls will become 12 below
+			if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
+			continue;
+
+			// store class talent tab pages
+			for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
+			if (talentTabInfo->ClassMask & (1 << (cls - 1)))
+				sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabInfo->TalentTabID;
+		}	
+
+		sTalentTabPagesInitialized = true;
+}
+
+namespace BotAI {
+    uint32 const* GetTalentTabPages(uint8 cls)
+    {
+        initializeTalentTabPages();
+        return sTalentTabPages[cls];
+    }
+}
+
 vector<string>& split(const string &s, char delim, vector<string> &elems)
 {
     stringstream ss(s);

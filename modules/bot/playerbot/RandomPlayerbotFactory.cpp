@@ -220,7 +220,7 @@ bool RandomPlayerbotFactory::CreateNotRandomBot(uint32 nid)
     CharSectionsEntry const* facialHair = GetRandomCharSection(race, SECTION_TYPE_FACIAL_HAIR, gender, hair->Color);
     uint8 outfitId = 0;
 
-	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER, 2, 0, LOCALE_enUS, 0, false, true);
+	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER, 2, 0, LOCALE_enUS, 0, false, true, -1);
     if (!session)
     {
         sLog->outBasic("Couldn't create session for random bot account %d", accountId);
@@ -279,7 +279,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 	CharSectionsEntry const* facialHair = GetRandomCharSection(race, SECTION_TYPE_FACIAL_HAIR, gender, hair->Color);
 	uint8 outfitId = 0;
 
-	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER, 2, 0, LOCALE_enUS, 0, false, true);
+	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER, 2, 0, LOCALE_enUS, 0, false, true, -1);
 	if (!session)
 	{
 		sLog->outError("Couldn't create session for random bot account %d", accountId);

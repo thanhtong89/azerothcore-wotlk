@@ -2,7 +2,7 @@
 #include "../../playerbot.h"
 #include "AreaTriggerAction.h"
 #include "../../PlayerbotAIConfig.h"
-
+#include "Opcodes.h"
 
 using namespace BotAI;
 

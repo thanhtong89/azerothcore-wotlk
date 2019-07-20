@@ -15,6 +15,7 @@
 #include "CellImpl.h"
 #include "FleeManager.h"
 
+#include "GameGraveyard.h"
 using namespace BotAI;
 using namespace std;
 
@@ -179,7 +180,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 	if (player->InBattleground() && player->isDead())
 	{
 		Battleground *bg = player->GetBattleground();		
-		const WorldSafeLocsEntry *pos = sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeamId());
+		const GraveyardStruct *pos = sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeamId());
 		if (!player->IsWithinDist3d(pos->x,pos->y,pos->z,3.0))
 		{
 			// Special handle for battleground maps

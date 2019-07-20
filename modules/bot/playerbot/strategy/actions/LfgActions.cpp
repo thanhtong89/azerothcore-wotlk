@@ -1,7 +1,7 @@
 #include "../../../pchdef.h"
 #include "../../playerbot.h"
 #include "LfgActions.h"
-
+#include "Player.h"
 #include "Battleground.h"
 
 using namespace BotAI;

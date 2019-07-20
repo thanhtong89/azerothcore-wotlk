@@ -1231,7 +1231,7 @@ void PlayerbotFactory::InitAvailableSpells()
 void PlayerbotFactory::InitQuestSpells()
 {
 	const std::unordered_map<uint32, Quest*> allClassSpellQuestTemplates = sObjectMgr->GetClassSpellQuestTemplates();
-	for (std::unordered_map<uint32, Quest*>::iterator i = allClassSpellQuestTemplates.begin(); i != allClassSpellQuestTemplates.end(); ++i)
+	for (auto i = allClassSpellQuestTemplates.begin(); i != allClassSpellQuestTemplates.end(); ++i)
 	{
 		if (i->second->GetRequiredClasses() & bot->getClassMask())
 		{

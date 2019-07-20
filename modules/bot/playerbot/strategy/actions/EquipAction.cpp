@@ -1,7 +1,7 @@
 #include "../../../pchdef.h"
 #include "../../playerbot.h"
 #include "EquipAction.h"
-
+#include "Opcodes.h"
 #include "../values/ItemCountValue.h"
 
 using namespace BotAI;

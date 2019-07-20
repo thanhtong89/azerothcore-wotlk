@@ -66,7 +66,7 @@ namespace BotAI
 	private:
 		void calculatePossibleDestinations(list<FleePoint*> &points);
 		void calculateDistanceToPlayers(FleePoint *point);
-		void calculateDistanceToCreatures(FleePoint *point);
+		// void calculateDistanceToCreatures(FleePoint *point);
 		void cleanup(list<FleePoint*> &points);
 		FleePoint* selectOptimalDestination(list<FleePoint*> &points);
 		bool isBetterThan(FleePoint* point, FleePoint* other);
