@@ -181,6 +181,29 @@ class CharacterCreateInfo
         virtual ~CharacterCreateInfo(){};
 };
 
+// playerbot mod
+class BotCharacterCreateInfo
+{
+	friend class WorldSession;
+	friend class Player;
+
+public:
+	/// User specified variables
+	std::string Name;
+	uint8 Race = 0;
+	uint8 Class = 0;
+	uint8 Gender = GENDER_NONE;
+	uint8 Skin = 0;
+	uint8 Face = 0;
+	uint8 HairStyle = 0;
+	uint8 HairColor = 0;
+	uint8 FacialHair = 0;
+	uint8 OutfitId = 0;
+
+	/// Server side data
+	uint8 CharCount = 0;
+};
+
 /// Player session in the World
 class WorldSession
 {
@@ -770,6 +793,9 @@ class WorldSession
         void HandleHearthAndResurrect(WorldPacket& recvData);
         void HandleInstanceLockResponse(WorldPacket& recvPacket);
         void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
+
+        //playerbot mod
+        void HandleBotPackets();
 
         // Battlefield
         void SendBfInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 time);

@@ -1494,6 +1494,15 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
     delete roll;
 }
 
+uint64 Group::GetTargetIcon(uint8 index) {
+// returns	the uid of the player with target icon `index`
+//			0 if no player are with said target icon
+    if (index >= TARGETICONCOUNT)  {
+        return 0;
+    }
+    return m_targetIcons[index];
+}
+
 void Group::SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid)
 {
     if (id >= TARGETICONCOUNT)
