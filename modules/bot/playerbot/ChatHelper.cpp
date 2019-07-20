@@ -13,6 +13,7 @@ map<string, ChatMsg> ChatHelper::chats;
 map<uint8, string> ChatHelper::classes;
 map<uint8, string> ChatHelper::races;
 map<uint8, map<uint8, string> > ChatHelper::specs;
+uint32 const* GetTalentTabPages(uint8 cls);
 
 template<class T>
 static bool substrContainsInMap(string searchTerm, map<string, T> searchIn)
@@ -417,7 +418,7 @@ string ChatHelper::formatClass(Player* player, int spec)
     out << specs[cls][spec] << " (";
 
     int c0 = 0, c1 = 0, c2 = 0;
-    PlayerTalentMap& talentMap = player->GetTalentMap(0);
+    PlayerTalentMap talentMap = player->GetTalentMap();
     for (PlayerTalentMap::iterator i = talentMap.begin(); i != talentMap.end(); ++i)
     {
         uint32 spellId = i->first;

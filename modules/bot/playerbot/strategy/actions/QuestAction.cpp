@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "QuestAction.h"
 #include "../../PlayerbotAIConfig.h"
+#include "Opcodes.h"
 
 using namespace BotAI;
 

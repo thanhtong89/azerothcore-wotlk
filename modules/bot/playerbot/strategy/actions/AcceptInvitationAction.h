@@ -2,6 +2,7 @@
 
 #include "../Action.h"
 #include "../../../Globals/ObjectMgr.h"
+#include "Opcodes.h"
 
 namespace BotAI
 {

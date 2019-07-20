@@ -3,6 +3,7 @@
 #include "ReadyCheckAction.h"
 #include "../../PlayerbotAIConfig.h"
 #include "../../../Entities/Pet/Pet.h"
+#include "Opcodes.h"
 
 using namespace BotAI;
 

@@ -1,6 +1,7 @@
 #include "../../../pchdef.h"
 #include "../../playerbot.h"
 #include "LootAction.h"
+#include "Opcodes.h"
 
 #include "../../LootObjectStack.h"
 #include "../../PlayerbotAIConfig.h"

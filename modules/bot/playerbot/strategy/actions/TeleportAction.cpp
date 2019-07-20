@@ -3,6 +3,7 @@
 #include "TeleportAction.h"
 #include "../values/LastMovementValue.h"
 #include "../../PlayerbotAI.h"
+#include "Opcodes.h"
 
 using namespace BotAI;
 

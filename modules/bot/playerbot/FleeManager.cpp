@@ -38,22 +38,22 @@ void FleeManager::calculateDistanceToPlayers(FleePoint *point)
 	}
 }
 
-void FleeManager::calculateDistanceToCreatures(FleePoint *point)
-{
-	RangePair &distance = point->toCreatures;
-
-	list<uint64> units = *bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<list<uint64> >("possible targets");
-	for (list<uint64>::iterator i = units.begin(); i != units.end(); ++i)
-    {
-		Unit* unit = bot->GetPlayerbotAI()->GetUnit(*i);
-		if (!unit)
-		    continue;
-
-		float d = unit->GetDistance2d(point->x, point->y);
-
-		distance.probe(d);
-	}
-}
+// void FleeManager::calculateDistanceToCreatures(FleePoint *point)
+// {
+// 	RangePair &distance = point->toCreatures;
+// 
+// 	list<uint64> units = *bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<list<uint64> >("possible targets");
+// 	for (list<uint64>::iterator i = units.begin(); i != units.end(); ++i)
+//     {
+// 		Unit* unit = bot->GetPlayerbotAI()->GetUnit(*i);
+// 		if (!unit)
+// 		    continue;
+// 
+// 		float d = unit->GetDistance2d(point->x, point->y);
+// 
+// 		distance.probe(d);
+// 	}
+// }
 
 void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
 {
@@ -79,7 +79,7 @@ void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
 
 			FleePoint *point = new FleePoint(x, y, z);
             calculateDistanceToPlayers(point);
-            calculateDistanceToCreatures(point);
+            //calculateDistanceToCreatures(point);
 			if (point->isReasonable())
 				points.push_back(point);
             else

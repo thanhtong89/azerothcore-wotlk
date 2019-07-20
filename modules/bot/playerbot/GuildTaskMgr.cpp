@@ -33,7 +33,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
 
     uint32 guildId = guildMaster->GetGuildId();
-    if (!guildId || !guildMaster->GetPlayerbotAI() || !guildMaster->GetGuild())
+    if (!guildId || /*!guildMaster->GetPlayerbotAI() || */ !guildMaster->GetGuild())
         return;
 
     if (!player->IsFriendlyTo(guildMaster))
@@ -41,13 +41,13 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
 
 	Guild *guild = sGuildMgr->GetGuildById(guildMaster->GetGuildId());
     DenyReason reason = PLAYERBOT_DENY_NONE;
-    PlayerbotSecurityLevel secLevel = guildMaster->GetPlayerbotAI()->GetSecurity()->LevelFor(player, &reason);
-    if (secLevel == PLAYERBOT_SECURITY_DENY_ALL || (secLevel == PLAYERBOT_SECURITY_TALK && reason != PLAYERBOT_DENY_FAR))
-    {
-        sLog->outDetail("%s / %s: skipping guild task update - not enough security level, reason = %u",
-                guildMaster->GetGuild()->GetName().c_str(), player->GetName().c_str(), reason);
-        return;
-    }
+//    PlayerbotSecurityLevel secLevel = guildMaster->GetPlayerbotAI()->GetSecurity()->LevelFor(player, &reason);
+//    if (secLevel == PLAYERBOT_SECURITY_DENY_ALL || (secLevel == PLAYERBOT_SECURITY_TALK && reason != PLAYERBOT_DENY_FAR))
+//    {
+//        sLog->outDetail("%s / %s: skipping guild task update - not enough security level, reason = %u",
+//                guildMaster->GetGuild()->GetName().c_str(), player->GetName().c_str(), reason);
+//        return;
+//    }
 
 	sLog->outDetail("%s: guild task update for player %s", guild->GetName(), player->GetName());
 

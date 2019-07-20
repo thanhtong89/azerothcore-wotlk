@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Action.h"
+#include "Opcodes.h"
 
 namespace BotAI
 {

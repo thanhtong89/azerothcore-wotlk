@@ -17,6 +17,8 @@
 #include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
 
+uint32 const* GetTalentTabPages(uint8 cls);
+
 
 AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* ai)
 {
@@ -59,7 +61,7 @@ AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* a
 int AiFactory::GetPlayerSpecTab(Player* player)
 {
     int c0 = 0, c1 = 0, c2 = 0;
-    PlayerTalentMap& talentMap = player->GetTalentMap(0);
+    PlayerTalentMap talentMap = player->GetTalentMap();
     for (PlayerTalentMap::iterator i = talentMap.begin(); i != talentMap.end(); ++i)
     {
         uint32 spellId = i->first;

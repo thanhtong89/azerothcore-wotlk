@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "TaxiAction.h"
 #include "../values/LastMovementValue.h"
+#include "Opcodes.h"
 
 using namespace BotAI;
 
