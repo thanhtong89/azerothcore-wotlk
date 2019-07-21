@@ -163,18 +163,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
 	uint8 level = getLevel();
 	m_baseSpellPower = 0;
 	if (level > 80) {
-		switch (getClass()) {
-			case CLASS_MAGE:
-			case CLASS_WARLOCK:
-			case CLASS_PRIEST:
-			case CLASS_DRUID:
-			case CLASS_SHAMAN:
-				ApplySpellPowerBonus(1.45 * GetStat(STAT_INTELLECT), true);
-			break;
-			default:
-				ApplySpellPowerBonus(1.25 * GetStat(STAT_INTELLECT), true);
-				
-		}
+		ApplySpellPowerBonus(.9 * GetStat(STAT_INTELLECT), true);
 	}
 
 	// Get healing bonus for all schools
