@@ -163,7 +163,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
     uint8 level = getLevel();
     m_baseSpellPower = 0;
     if (level > 80) {
-        ApplySpellPowerBonus(1.8 * GetStat(STAT_INTELLECT), true);
+        ApplySpellPowerBonus(2*GetStat(STAT_INTELLECT), true);
     }
 
     // Get healing bonus for all schools
@@ -900,10 +900,9 @@ void Player::UpdateManaRegen()
     }
 
     float Intellect = GetStat(STAT_INTELLECT);
-    float Spirit = GetStat(STAT_SPIRIT);
     uint8 level = getLevel();
     if (level > 80) {
-        m_baseManaRegen = 250 + .2 * (Spirit + Intellect);
+        m_baseManaRegen = .3 * Intellect;
     }
     // Mana regen from spirit and intellect
     float power_regen = sqrt(Intellect) * OCTRegenMPPerSpirit();
