@@ -8,6 +8,9 @@ ConfVersion=2010102201
 # Enable or disable AI Playerbot
 AiPlayerbot.Enabled = 1
 
+# Classic mode (?) -- maybe required for .bot cmds
+Classic.Playerbots.Mode = true
+
 # Unknown
 AiPlayerbot.RandomClassSpecProbability.0.0 = 33
 AiPlayerbot.RandomClassSpecProbability.0.1 = 33
