@@ -34,12 +34,10 @@ void initializeTalentTabPages() {
 		sTalentTabPagesInitialized = true;
 }
 
-namespace BotAI {
-    uint32 const* GetTalentTabPages(uint8 cls)
-    {
-        initializeTalentTabPages();
-        return sTalentTabPages[cls];
-    }
+uint32 const* GetTalentTabPages(uint8 cls)
+{
+    initializeTalentTabPages();
+    return sTalentTabPages[cls];
 }
 
 vector<string>& split(const string &s, char delim, vector<string> &elems)

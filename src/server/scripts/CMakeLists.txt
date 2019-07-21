@@ -117,3 +117,5 @@ add_dependencies(scripts revision.h)
 if (USE_SCRIPTPCH)
   add_cxx_pch(scripts ${PRIVATE_PCH_HEADER})
 endif()
+
+CU_RUN_HOOK(AFTER_SCRIPTS_LIBRARY)

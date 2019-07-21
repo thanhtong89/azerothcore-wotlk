@@ -16,6 +16,7 @@
 #include "FleeManager.h"
 
 #include "GameGraveyard.h"
+#include "PlayerbotMgr.h"
 using namespace BotAI;
 using namespace std;
 
