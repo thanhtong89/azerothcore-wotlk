@@ -1,192 +1,270 @@
-# Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-#
-# This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without
-# modifications, as long as this notice is preserved.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-file(GLOB_RECURSE sources_playerbot playerbot/*.cpp playerbot/*.h)
-file(GLOB_RECURSE sources_pch pch/*.cpp pch/*.h)
-
-set(bot_STAT_SRCS
-  ${bot_STAT_SRCS}  
-  ${sources_playerbot}
-  ${sources_pch}
-)
-
-
-if (USE_COREPCH)
-  set(PRIVATE_PCH_HEADER pch/pch.h)
-  set(PRIVATE_PCH_SOURCE pch/pch.cpp)
-endif()
-
-include_directories(
-   ${game_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Detour/Include
-  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/deps/SFMT
-  ${CMAKE_SOURCE_DIR}/deps/zlib
-  ${CMAKE_SOURCE_DIR}/src/common
-  ${CMAKE_SOURCE_DIR}/src/common/Collision
-  ${CMAKE_SOURCE_DIR}/src/common/Collision/Management
-  ${CMAKE_SOURCE_DIR}/src/common/Collision/Models
-  ${CMAKE_SOURCE_DIR}/src/common/Configuration
-  ${CMAKE_SOURCE_DIR}/src/common/Cryptography
-  ${CMAKE_SOURCE_DIR}/src/common/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/src/common/Database
-  ${CMAKE_SOURCE_DIR}/src/common/DataStores
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging
-  ${CMAKE_SOURCE_DIR}/src/common/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/src/common/Dynamic
-  ${CMAKE_SOURCE_DIR}/src/common/Logging
-  ${CMAKE_SOURCE_DIR}/src/common/Packets
-  ${CMAKE_SOURCE_DIR}/src/common/Threading
-  ${CMAKE_SOURCE_DIR}/src/common/Utilities
-  ${CMAKE_SOURCE_DIR}/src/server/game/Addons/Addons
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/src/server/game/Accounts
-  ${CMAKE_SOURCE_DIR}/src/server/game/Achievements
-  ${CMAKE_SOURCE_DIR}/src/server/game/Addons
-  ${CMAKE_SOURCE_DIR}/src/server/game/AI
-  ${CMAKE_SOURCE_DIR}/src/server/game/AI/CoreAI
-  ${CMAKE_SOURCE_DIR}/src/server/game/AI/ScriptedAI
-  ${CMAKE_SOURCE_DIR}/src/server/game/AI/SmartScripts
-  ${CMAKE_SOURCE_DIR}/src/server/game/AuctionHouse
-  ${CMAKE_SOURCE_DIR}/src/server/game/Battlefield
-  ${CMAKE_SOURCE_DIR}/src/server/game/Battlefield/Zones
-  ${CMAKE_SOURCE_DIR}/src/server/game/Battlegrounds
-  ${CMAKE_SOURCE_DIR}/src/server/game/Battlegrounds/Zones
-  ${CMAKE_SOURCE_DIR}/src/server/game/Calendar
-  ${CMAKE_SOURCE_DIR}/src/server/game/Chat
-  ${CMAKE_SOURCE_DIR}/src/server/game/Chat/Channels
-  ${CMAKE_SOURCE_DIR}/src/server/game/Combat
-  ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
-  ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
-  ${CMAKE_SOURCE_DIR}/src/server/game/DungeonFinding
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Creature
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Corpse
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/DynamicObject
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/GameObject
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Item
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Item/Container
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object/Updates
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Pet
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Player
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Totem
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Unit
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Vehicle
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Transport
-  ${CMAKE_SOURCE_DIR}/src/server/game/Events
-  ${CMAKE_SOURCE_DIR}/src/server/game/Globals
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids/Cells
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids/Notifiers
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids
-  ${CMAKE_SOURCE_DIR}/src/server/game/Groups
-  ${CMAKE_SOURCE_DIR}/src/server/game/Guilds
-  ${CMAKE_SOURCE_DIR}/src/server/game/Handlers
-  ${CMAKE_SOURCE_DIR}/src/server/game/Instances
-  ${CMAKE_SOURCE_DIR}/src/server/game/Loot
-  ${CMAKE_SOURCE_DIR}/src/server/game/Mails
-  ${CMAKE_SOURCE_DIR}/src/server/game/Maps
-  ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Spline
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Waypoints
-  ${CMAKE_SOURCE_DIR}/src/server/game/OutdoorPvP
-  ${CMAKE_SOURCE_DIR}/src/server/game/Petitions
-  ${CMAKE_SOURCE_DIR}/src/server/game/Pools
-  ${CMAKE_SOURCE_DIR}/src/server/game/PrecompiledHeaders
-  ${CMAKE_SOURCE_DIR}/src/server/game/Quests
-  ${CMAKE_SOURCE_DIR}/src/server/game/Reputation
-  ${CMAKE_SOURCE_DIR}/src/server/game/Scripting
-  ${CMAKE_SOURCE_DIR}/src/server/game/Server/Protocol
-  ${CMAKE_SOURCE_DIR}/src/server/game/Server
-  ${CMAKE_SOURCE_DIR}/src/server/game/Skills
-  ${CMAKE_SOURCE_DIR}/src/server/game/Spells
-  ${CMAKE_SOURCE_DIR}/src/server/game/Spells/Auras
-  ${CMAKE_SOURCE_DIR}/src/server/game/Texts
-  ${CMAKE_SOURCE_DIR}/src/server/game/Tools
-  ${CMAKE_SOURCE_DIR}/src/server/game/Tickets
-  ${CMAKE_SOURCE_DIR}/src/server/game/Warden
-  ${CMAKE_SOURCE_DIR}/src/server/game/Warden/Modules
-  ${CMAKE_SOURCE_DIR}/src/server/game/Weather
-  ${CMAKE_SOURCE_DIR}/src/server/game/World
-  ${CMAKE_SOURCE_DIR}/src/server/game/ArenaSpectator
-  ${CMAKE_SOURCE_DIR}/src/server/game/Misc
-  ${CMAKE_SOURCE_DIR}/src/server/scripts/
-  ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
-  ${ACE_INCLUDE_DIR}
-  ${MYSQL_INCLUDE_DIR}
-  ${OPENSSL_INCLUDE_DIR}
-)
-
-add_library(bot STATIC
-  ${bot_STAT_SRCS}
-  ${bot_STAT_PCH_SRC}
-)
-
-
-# Do NOT add any extra include directory unless it does not create unneeded extra dependencies,
-# and specially, not add any dependency to neither of these: shared, game, scripts
-# This way we ensure that if either a PR does that without modifying this file,
-# a compile error will be generated, either this file will be modified so it
-# is detected more easily.
-# While it is OK to include files from other libs as long as they don't require
-# linkage (enums, defines...) it is discouraged to do so unless necessary, as it will pullute
-# include_directories leading to further unnoticed dependency aditions
-# Linker Depencency requirements: common
-
-target_include_directories(bot
-  PUBLIC
-    ${PUBLIC_INCLUDES}
-  PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR})
-
-add_definitions(-DTRINITY_API_EXPORT_bot)
-
-target_link_libraries(bot
-  ${MYSQL_LIBRARY})
-
-set_target_properties(bot
-    PROPERTIES
-      FOLDER
-        "server")
-if( NOT WIN32 )
-  set_target_properties(bot PROPERTIES
-    COMPILE_DEFINITIONS _TRINITY_BOT_CONFIG="${CONF_DIR}/aiplayerbot.conf"
-  )
-endif()
-
-if( BUILD_SHARED_LIBS )
-  if( UNIX )
-    install(TARGETS bot
-      LIBRARY
-        DESTINATION lib)
-  elseif( WIN32 )
-    install(TARGETS bot
-      RUNTIME
-        DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  endif()
-endif()
-
-if( WIN32 )
-  if ( MSVC )
-    add_custom_command(TARGET bot
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/aiplayerbot.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-    )
-  elseif ( MINGW )
-    add_custom_command(TARGET bot
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/aiplayerbot.conf.dist ${CMAKE_BINARY_DIR}/bin/
-    )
-  endif()
-endif()
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/RandomPlayerbotMgr.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/FleeManager.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/Helpers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/LootObjectStack.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotMgr.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/ChatFilter.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotAI.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/AiFactory.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/RandomPlayerbotFactory.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotCommandServer.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotAIBase.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/RandomItemMgr.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/GuildTaskMgr.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/ChatHelper.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/triggers/GenericTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/triggers/LootTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/triggers/CureTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/triggers/HealthTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/AiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/AiObject.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/DpsWarriorStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/TankWarriorStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/GenericWarriorStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/WarriorActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/WarriorTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/WarriorMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/WarriorAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warrior/GenericWarriorNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/DpsWarlockStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/WarlockMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/GenericWarlockStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/WarlockTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/WarlockActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/TankWarlockStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/GenericWarlockNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/warlock/WarlockAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/GenericDruidNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/BearTankDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/CatDpsDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/FeralDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/HealDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/DruidAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/DruidActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/GenericDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/CasterDruidStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/DruidMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/druid/DruidTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/PriestMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/HealPriestStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/PriestActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/PriestNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/ShadowPriestStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/PriestAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/PriestTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/GenericPriestStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/priest/HolyPriestStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Engine.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/LineTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/TargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestFriendlyPlayersValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/ItemCountValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/GrindTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestGameObjects.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestNonBotPlayersValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PositionValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/EnemyHealerTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/EnemyPlayerValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/AoeHealValues.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/RtiValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/InvalidTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/StatsValues.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/DpsTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/AttackerCountValues.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PartyMemberToResurrect.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/ItemUsageValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestNpcsValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/DuelTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/LeastHpTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PartyMemberWithoutAuraValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/ItemForSpellValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/CcTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/SpellCastUsefulValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/CurrentCcTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PossibleTargetsValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/ThreatValues.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/Formations.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/AttackersValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/AttackerWithoutAuraTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestCorpsesValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PartyMemberToDispel.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/TankTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/SpellIdValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/CurrentTargetValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PartyMemberValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/PartyMemberToHeal.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/NearestAdsValue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/values/formations/Arrow.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/RogueTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/GenericRogueNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/DpsRogueStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/RogueMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/RogueAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/rogue/RogueActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/CustomStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/PaladinMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/PaladinTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/PaladinActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/HealPaladinStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/TankPaladinStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/DpsPaladinStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/PaladinAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/GenericPaladinNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/PaladinBuffStrategies.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/paladin/GenericPaladinStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/FleeStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/EmoteStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/CastTimeStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/UseFoodStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/WorldPacketHandlerStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/GrindingStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/RangedCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/ConserveManaStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/RunawayStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/GuardStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/MoveRandomStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/PullStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/NonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/LootNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/ChatCommandHandlerStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/UsePotionsStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/DeadStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/PassiveStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/QuestStrategies.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/FollowMasterStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/DuelStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/CombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/ThreatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/TankAoeStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/RacialsStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/StayStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/DpsAssistStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/SayStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/MeleeCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/AttackEnemyPlayersStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/KiteStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/generic/TellTargetStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Action.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Strategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Multiplier.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Queue.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Value.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/PassiveMultiplier.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/ArcaneMageStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/MageActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/GenericMageStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/MageAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/MageTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/GenericMageNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/FireMageStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/MageMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/mage/FrostMageStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/ActionBasket.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/CheckMailAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/BuyAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TellCastFailedAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TeleportAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ListQuestsActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/CheckMountStateAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/PositionAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/QueryQuestAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/QueryItemUsageAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/BuffAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SuggestWhatToDoAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ListSpellsAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/RememberTaxiAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/LogLevelAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/UseMeetingStoneAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/WhoAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SetHomeAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/AcceptQuestAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/GossipHelloAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/GenericActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ReadyCheckAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TalkToQuestGiverAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TradeAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/UnequipAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ChangeChatAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TellLosAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/EquipAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/HelpAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ResetAiAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/RevealGatheringItemAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ChatShortcutActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/AreaTriggerAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SayAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/InventoryAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/QuestAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/LfgActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TrainerAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ChangeTalentsAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/DropQuestAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/DestroyItemAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/LootAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TaxiAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ReviveFromCorpseAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/FollowActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/GenericSpellActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SaveManaAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/GuildBankAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/RewardAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/EmoteAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/ChangeStrategyAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/LootStrategyAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/AttackAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/LootRollAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TellItemCountAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/InventoryChangeFailureAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/GuildAcceptAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/NonCombatActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/AddLootAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/UseItemAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SecurityCheckAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SendMailAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TellTargetAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/StayActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/MovementActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/SellAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/RepairAllAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TradeStatusAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/StatsAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/TellReputationAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/BankAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/actions/CastCustomSpellAction.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Event.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/DKTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/GenericDKStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/UnholyDKStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/FrostDKStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/BloodDKStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/DKAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/GenericDKNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/DKActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/DK/DKMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/HunterAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/HunterActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/GenericHunterStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/HunterBuffStrategies.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/HunterMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/HunterTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/DpsHunterStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/hunter/GenericHunterNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/Trigger.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/ShamanTriggers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/ShamanNonCombatStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/CasterShamanStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/ShamanMultipliers.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/ShamanAiObjectContext.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/MeleeShamanStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/GenericShamanStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/TotemsShamanStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/HealShamanStrategy.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/strategy/shaman/ShamanActions.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotAIConfig.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotSecurity.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotDbStore.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/playerbot/PlayerbotFactory.cpp")
+######
+CU_SET_PATH("CMAKE_MOD_PLAYERBOT_DIR" "${CMAKE_CURRENT_LIST_DIR}")
+AC_ADD_SCRIPT_LOADER("Playerbot" "${CMAKE_CURRENT_LIST_DIR}/playerbot/playerbot_loader.h")
+AC_ADD_CONFIG_FILE("${CMAKE_CURRENT_LIST_DIR}/playerbot/aiplayerbot.conf.dist")
