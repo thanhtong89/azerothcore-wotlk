@@ -835,8 +835,11 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
 		return;*/
 
 	if (!sPlayerbotAIConfig.ClassicBotMode)
+        {
+                sLog->outBasic("ClassicBotMode inactive.");
 		return;
-
+        }
+        sLog->outBasic("ClassicBotMode activated.");
 	uint32 accountId = player->GetSession()->GetAccountId();
 	QueryResult results = CharacterDatabase.PQuery(
 		"SELECT name FROM characters WHERE account = '%u'",
