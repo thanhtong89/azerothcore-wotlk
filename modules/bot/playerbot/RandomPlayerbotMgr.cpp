@@ -370,7 +370,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 		sLog->outBasic("Preparing random teleport caches for %d levels...", maxLevel);
 		for (uint8 level = 1; level <= maxLevel; level++)
 		{
-			QueryResult results = WorldDatabase.PQuery("select map, position_x, position_y, position_z "
+                        auto format = "select map, position_x, position_y, position_z "
 				"from (select map, position_x, position_y, position_z, avg(t.maxlevel), avg(t.minlevel), "
 				"%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
 				"from creature c inner join creature_template t on c.id = t.entry group by t.entry) q "
@@ -387,7 +387,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 				"(q1.position_x - q.position_x)*(q1.position_x - q.position_x) +"
 				"(q1.position_y - q.position_y)*(q1.position_y - q.position_y) +"
 				"(q1.position_z - q.position_z)*(q1.position_z - q.position_z)"
-				") < %u)",
+				") < %u)";
+                        auto size = std::snprintf(nullptr, 0, format,
 				level,
 				sPlayerbotAIConfig.randomBotTeleLevel,
 				sPlayerbotAIConfig.randomBotMapsAsString.c_str(),
@@ -395,6 +396,17 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 				sPlayerbotAIConfig.randomBotTeleLevel,
 				(uint32)sPlayerbotAIConfig.sightDistance
 			);
+                        std::string queryStr(size + 1, '\0');
+                        std::sprintf(&queryStr[0], format,
+				level,
+				sPlayerbotAIConfig.randomBotTeleLevel,
+				sPlayerbotAIConfig.randomBotMapsAsString.c_str(),
+				level,
+				sPlayerbotAIConfig.randomBotTeleLevel,
+				(uint32)sPlayerbotAIConfig.sightDistance
+			);
+                        sLog->outBasic("Query: %s", queryStr);
+			QueryResult results = WorldDatabase.PQuery(queryStr.c_str());
 			if (results)
 			{
 				do
