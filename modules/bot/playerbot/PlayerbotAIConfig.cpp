@@ -4,10 +4,6 @@
 #include "RandomPlayerbotFactory.h"
 #include "../../game/Accounts/AccountMgr.h"
 
-#ifndef _TRINITY_BOT_CONFIG
-# define _TRINITY_BOT_CONFIG  "Settings/modules/bot_playerbots.conf"
-#endif
-
 using namespace std;
 
 PlayerbotAIConfig::PlayerbotAIConfig()
@@ -31,15 +27,6 @@ void LoadList(string value, T &list)
 bool PlayerbotAIConfig::Initialize()
 {
     sLog->outBasic("Initializing AI Playerbot by ike3, based on the original Playerbot by blueboy");
-
-    string error;
-	vector<string> args;
-    char const* cfg_file = _TRINITY_BOT_CONFIG;
-    if (!sConfigMgr->LoadInitial(cfg_file))
-    {
-        sLog->outBasic("AI Playerbot is Disabled. Unable to open configuration file bot_playerbots.conf");
-        return false;
-    }
 
     enabled = sConfigMgr->GetBoolDefault("AiPlayerbot.Enabled", true);
     if (!enabled)
@@ -250,4 +237,29 @@ void PlayerbotAIConfig::SetValue(string name, string value)
 
     else if (name == "IterationsPerTick")
         out >> iterationsPerTick;
+}
+
+
+class PlayerbotScript : public WorldScript
+
+{
+public:
+
+    PlayerbotScript() : WorldScript("PlayerbotScript") { }
+    void OnAfterConfigLoad(bool reload) override {
+        sPlayerbotAIConfig.Initialize();
+    }
+
+    void OnBeforeConfigLoad(bool reload) override
+    {
+	if (!reload) {
+	    std::string conf_path = _CONF_DIR;
+	    std::string cfg_file = conf_path + "/aiplayerbot.conf";
+	    bool success = sConfigMgr->LoadMore(cfg_file.c_str());
+	}
+    }
+};
+// new module loading style
+void AddPlayerbotScripts(){
+    new PlayerbotScript();
 }

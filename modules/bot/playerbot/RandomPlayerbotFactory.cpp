@@ -350,6 +350,7 @@ string RandomPlayerbotFactory::CreateRandomBotName()
 
 void RandomPlayerbotFactory::CreateRandomBots()
 {
+        sLog->outBasic("random bot creation section");
 	if (sPlayerbotAIConfig.deleteRandomBotAccounts)
 	{
 		sLog->outBasic("Deleting random bot accounts...");
@@ -390,11 +391,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
 		sLog->outBasic("Random bot accounts deleted");
 	}
 	int maxBotAccountCount = sPlayerbotAIConfig.randomBotAccountCount;
+        sLog->outBasic("Number of random bots to create: %d", maxBotAccountCount);
 	for (int accountNumber = 0; accountNumber < maxBotAccountCount; ++accountNumber)
 	{
 		ostringstream out; out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
 		string accountName = out.str();
 		const char* name_cstr = accountName.c_str();
+                sLog->outBasic("Checking random bot account '%s'", name_cstr);
 		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);		
 		if (results)
 		{
@@ -406,6 +409,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 		{
 			password += (char)urand('!', 'z');
 		}
+                sLog->outBasic("Creating random bot account '%s'", name_cstr);
 		AccountOpResult result = AccountMgr::CreateAccount(accountName, password);
 		switch (result)
 		{
