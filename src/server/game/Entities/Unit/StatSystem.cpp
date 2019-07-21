@@ -159,13 +159,6 @@ void Player::UpdateSpellDamageAndHealingBonus()
 { 
     // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
-    // For levels beyond wotlk level cap, always apply spellpower bonus
-    uint8 level = getLevel();
-    m_baseSpellPower = 0;
-    if (level > 80) {
-	ApplySpellPowerBonus(2*GetStat(STAT_INTELLECT), true);
-    }
-
     // Get healing bonus for all schools
     SetStatInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL));
     // Get damage bonus for all schools
