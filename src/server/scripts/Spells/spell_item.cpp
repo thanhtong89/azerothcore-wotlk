@@ -1386,6 +1386,49 @@ class spell_item_direbrew_remote : public SpellScriptLoader
         }
 };
 
+enum eArgentKnight
+{
+    SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE = 54296
+};
+
+class spell_item_summon_argent_knight :  public SpellScriptLoader
+{
+    public:
+        spell_item_summon_argent_knight() : SpellScriptLoader("spell_item_summon_argent_knight") { }
+
+        class spell_item_summon_argent_knight_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_summon_argent_knight_SpellScript);
+
+            void HandleOnEffectHit(SpellEffIndex effIndex)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        // summoning the "Argent Knight (Horde)" is default for spell 54307;
+                        if (caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            // prevent default summoning and summon "Argent Knight (Alliance)" instead
+                            PreventHitDefaultEffect(effIndex);
+                            caster->CastSpell(caster, SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_item_summon_argent_knight_SpellScript::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SUMMON);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_summon_argent_knight_SpellScript();
+        }
+};
+
 
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
@@ -1499,6 +1542,39 @@ class spell_item_arcane_shroud : public SpellScriptLoader
         {
             return new spell_item_arcane_shroud_AuraScript();
         }
+};
+
+// 64415 - Val'anyr Hammer of Ancient Kings - Equip Effect
+class spell_item_valanyr_hammer_of_ancient_kings : public SpellScriptLoader
+{
+public:
+    spell_item_valanyr_hammer_of_ancient_kings() : SpellScriptLoader("spell_item_valanyr_hammer_of_ancient_kings") { }
+
+    class spell_item_valanyr_hammer_of_ancient_kingsAuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_valanyr_hammer_of_ancient_kingsAuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+
+            SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
+            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+                return false;
+
+            return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+
+        }
+
+        void Register()
+        {
+            DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_ancient_kingsAuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_item_valanyr_hammer_of_ancient_kingsAuraScript();
+    }
 };
 
 // 64411 - Blessing of Ancient Kings (Val'anyr, Hammer of Ancient Kings)
@@ -2484,11 +2560,17 @@ class spell_item_shadowmourne : public SpellScriptLoader
                     }
                 }
             }
+			
+			void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+			{
+				GetTarget()->RemoveAurasDueToSpell(SPELL_SHADOWMOURNE_SOUL_FRAGMENT);
+			}
 
             void Register()
             {
                 DoCheckProc += AuraCheckProcFn(spell_item_shadowmourne_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_item_shadowmourne_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+				AfterEffectRemove += AuraEffectRemoveFn(spell_item_shadowmourne_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -3921,6 +4003,7 @@ void AddSC_item_spell_scripts()
     new spell_item_summon_or_dismiss();
     new spell_item_draenic_pale_ale();
     new spell_item_direbrew_remote();
+    new spell_item_summon_argent_knight();
 
     // Theirs
     // 23074 Arcanite Dragonling
@@ -3935,6 +4018,7 @@ void AddSC_item_spell_scripts()
     new spell_item_aegis_of_preservation();
     new spell_item_arcane_shroud();
     new spell_item_blessing_of_ancient_kings();
+    new spell_item_valanyr_hammer_of_ancient_kings();
     new spell_item_defibrillate("spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
     new spell_item_defibrillate("spell_item_goblin_jumper_cables_xl", 50, SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL);
     new spell_item_defibrillate("spell_item_gnomish_army_knife", 33);

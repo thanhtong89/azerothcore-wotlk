@@ -89,12 +89,33 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue):
-m_muteTime(mute_time), m_timeOutTime(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
-_security(sec), _skipQueue(skipQueue), _accountId(id), m_expansion(expansion), _logoutTime(0),
-m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()), m_sessionDbLocaleIndex(locale),
-m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter), isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0)
+WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime):
+    m_muteTime(mute_time),
+    m_timeOutTime(0),
+    _lastAuctionListItemsMSTime(0),
+    _lastAuctionListOwnerItemsMSTime(0),
+    m_GUIDLow(0),
+    _player(NULL),
+    m_Socket(sock),
+    _security(sec),
+    _skipQueue(skipQueue),
+    _accountId(id),    
+    m_expansion(expansion),
+    m_total_time(TotalTime),
+    _logoutTime(0),
+    m_inQueue(false),
+    m_playerLoading(false),
+    m_playerLogout(false),
+    m_playerSave(false),
+    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbLocaleIndex(locale),
+    m_latency(0),
+    m_clientTimeDelay(0),
+    m_TutorialsChanged(false),
+    recruiterId(recruiter),    
+    isRecruiter(isARecruiter),
+    m_currentBankerGUID(0),
+    timeWhoCommandAllowed(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -107,8 +128,8 @@ m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recru
     {
         m_Address = sock->GetRemoteAddress();
         sock->AddReference();
-        ResetTimeOutTime();
-        LoginDatabase.PExecute("UPDATE account SET online = online | (1<<(%u-1)) WHERE id = %u;", realmID, GetAccountId());
+        ResetTimeOutTime(false);
+        LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
     }
 
     InitializeQueryCallbackParameters();
@@ -117,6 +138,8 @@ m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recru
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
+    LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
+
     ///- unload player if not unloaded
     if (_player)
         LogoutPlayer (true);
@@ -124,7 +147,7 @@ WorldSession::~WorldSession()
     /// - If have unclosed socket, close it
     if (m_Socket)
     {
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket("WorldSession destructor");
         m_Socket->RemoveReference();
         m_Socket = NULL;
     }
@@ -141,7 +164,7 @@ WorldSession::~WorldSession()
         delete packet;
 
     if (GetShouldSetOfflineInDB())
-        LoginDatabase.PExecute("UPDATE account SET online = online & ~(1<<(%u-1)) WHERE id = %u;", realmID, GetAccountId());     // One-time query
+        LoginDatabase.PExecute("UPDATE account SET online = 0 WHERE id = %u;", GetAccountId());     // One-time query
 }
 
 std::string const & WorldSession::GetPlayerName() const
@@ -224,7 +247,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 #endif
 
     if (m_Socket->SendPacket(*packet) == -1)
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
 }
 
 /// Add an incoming packet to the queue
@@ -242,8 +265,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     if (updater.ProcessLogout())
     {
         UpdateTimeOutTime(diff);
-        if (IsConnectionIdle())
-            m_Socket->CloseSocket();
+        
+        /// If necessary, kick the player because the client didn't send anything for too long
+        /// (or they've been idling in character select)
+        if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle())
+            m_Socket->CloseSocket("Client didn't send anything for too long");
     }
 
     HandleTeleportTimeout(updater.ProcessLogout());
@@ -613,10 +639,10 @@ void WorldSession::LogoutPlayer(bool save)
 }
 
 /// Kick a player out of the World
-void WorldSession::KickPlayer(bool setKicked)
+void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
     if (m_Socket)
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket(reason);
 
     if (setKicked)
         SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
@@ -657,7 +683,7 @@ void WorldSession::SendNotification(uint32 string_id, ...)
     }
 }
 
-const char *WorldSession::GetTrinityString(int32 entry) const
+char const* WorldSession::GetTrinityString(uint32 entry) const
 {
     return sObjectMgr->GetTrinityString(entry, GetSessionDbLocaleIndex());
 }
@@ -806,15 +832,12 @@ void WorldSession::SaveTutorialsData(SQLTransaction &trans)
     if (!m_TutorialsChanged)
         return;
 
-    bool hasTutorials = false;
-    for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-        if (m_Tutorials[i] != 0)
-        {
-            hasTutorials = true;
-            break;
-        }
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HAS_TUTORIALS);
+    stmt->setUInt32(0, GetAccountId());
+    bool hasTutorials = bool(CharacterDatabase.Query(stmt));
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(hasTutorials ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
+    stmt = CharacterDatabase.GetPreparedStatement(hasTutorials ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
+
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         stmt->setUInt32(i, m_Tutorials[i]);
     stmt->setUInt32(MAX_ACCOUNT_TUTORIAL_VALUES, GetAccountId());

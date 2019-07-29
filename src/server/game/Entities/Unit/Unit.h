@@ -938,7 +938,6 @@ private:
     uint32 _spellPhaseMask;
     uint32 _hitMask;
     uint32 _cooldown;
-    Spell* _spell;
     DamageInfo* _damageInfo;
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
@@ -1071,7 +1070,7 @@ struct GlobalCooldown
     uint32 cast_time;
 };
 
-typedef UNORDERED_MAP<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
+typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
 
 class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
 {
@@ -1290,7 +1289,7 @@ enum SpellCooldownFlags
     SPELL_COOLDOWN_FLAG_INCLUDE_EVENT_COOLDOWNS = 0x2   ///< Starts GCD for spells that should start their cooldown on events, requires SPELL_COOLDOWN_FLAG_INCLUDE_GCD set
 };
 
-typedef UNORDERED_MAP<uint32, uint32> PacketCooldowns;
+typedef std::unordered_map<uint32, uint32> PacketCooldowns;
 
 // delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
@@ -1344,11 +1343,11 @@ private:
 class Unit : public WorldObject
 {
     public:
-		// Playerbot mod
-		//Random preference
-		uint8 Preference = urand(0, 9);
+        // Playerbot mod
+        //Random preference
+        uint8 Preference = urand(0, 9);
 
-        typedef UNORDERED_SET<Unit*> AttackerSet;
+        typedef std::unordered_set<Unit*> AttackerSet;
         typedef std::set<Unit*> ControlSet;
 
         typedef std::multimap<uint32,  Aura*> AuraMap;
@@ -1366,7 +1365,7 @@ class Unit : public WorldObject
         typedef std::list<Aura*> AuraList;
         typedef std::list<AuraApplication *> AuraApplicationList;
         typedef std::list<DiminishingReturn> Diminishing;
-        typedef UNORDERED_SET<uint32> ComboPointHolderSet;
+        typedef std::unordered_set<uint32> ComboPointHolderSet;
 
         typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
 
@@ -1691,6 +1690,8 @@ class Unit : public WorldObject
         bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
         bool IsInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
+        bool IsInCombatWith(Unit const* who) const;
+
         bool IsPetInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT); }
         void CombatStart(Unit* target, bool initialAggro = true);
         void CombatStartOnCast(Unit* target, bool initialAggro = true, uint32 duration = 0);
@@ -2563,6 +2564,7 @@ class Unit : public WorldObject
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
         uint32 _oldFactionId;           ///< faction before charm
+        bool m_petCatchUp;
 };
 
 namespace Trinity

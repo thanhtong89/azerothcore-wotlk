@@ -147,9 +147,9 @@ class AuctionHouseMgr
 
     public:
 
-        typedef UNORDERED_MAP<uint32, Item*> ItemMap;
-		typedef std::vector<AuctionEntry*> PlayerAuctions;
-		typedef std::pair<PlayerAuctions*, uint32> AuctionPair;
+        typedef std::vector<AuctionEntry*> PlayerAuctions;
+        typedef std::pair<PlayerAuctions*, uint32> AuctionPair;
+        typedef std::unordered_map<uint32, Item*> ItemMap;
 
         AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
         AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);

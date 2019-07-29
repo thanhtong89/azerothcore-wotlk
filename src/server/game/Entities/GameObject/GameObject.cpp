@@ -262,19 +262,36 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     }
 
     GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
-    // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-        SetWorldRotation(rotation);
-    else
-        SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // hackfix for the hackfix down below
+    switch (goinfo->entry)
+    {
+        // excluded ids from the hackfix below
+        // used switch since there should be more
+        case 181233: // maexxna portal effect
+        case 181575: // maexxna portal
+            SetWorldRotation(rotation);
+            break;
+        default:
+            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
+            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
+            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
+                SetWorldRotation(rotation);
+            else
+                SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+            break;
+    }
+
     // pussywizard: no PathRotation for normal gameobjects
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
 
@@ -333,6 +350,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
 
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
+
+    // Check if GameObject is Large
+    if (goinfo->IsLargeGameObject())
+        SetVisibilityDistanceOverride(true);
 
     return true;
 }
@@ -674,8 +695,9 @@ void GameObject::Update(uint32 diff)
                 //any return here in case battleground traps
                 // Xinef: Do not return here for summoned gos that should be deleted few lines below
                 // Xinef: Battleground objects are treated as spawned by default
-                if ((GetGOInfo()->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
-                    return;
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    if ((addon->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
+                        return;
             }
 
             loot.clear();
@@ -696,7 +718,8 @@ void GameObject::Update(uint32 diff)
             {
                 SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
-                SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
             }
 
             if (!m_respawnDelayTime)
@@ -720,6 +743,11 @@ void GameObject::Update(uint32 diff)
         }
     }
     sScriptMgr->OnGameObjectUpdate(this, diff);
+}
+
+GameObjectTemplateAddon const* GameObject::GetTemplateAddon() const
+{
+    return sObjectMgr->GetGameObjectTemplateAddon(GetGOInfo()->entry);
 }
 
 void GameObject::Refresh()
@@ -746,7 +774,9 @@ void GameObject::Delete()
     SendObjectDeSpawnAnim(GetGUID());
 
     SetGoState(GO_STATE_READY);
-    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
 
     // Xinef: if ritual gameobject is removed, clear anim spells
     if (GetGOInfo()->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
@@ -1235,6 +1265,7 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
+    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1447,7 +1478,8 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
             spellCaster = user;
-
+            tmpfish = true;
+            
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
@@ -1535,6 +1567,8 @@ void GameObject::Use(Unit* user)
                     }
                     else // else: junk
                         player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
+                        
+                    tmpfish = true;
                     break;
                 }
                 case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1549,7 +1583,10 @@ void GameObject::Use(Unit* user)
                 }
             }
 
-            player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+            if(tmpfish)
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+            else
+                player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
             return;
         }
 
@@ -1857,7 +1894,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     else
     {
         // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->setFaction(GetGOInfo()->faction ? GetGOInfo()->faction : 14);
+        trigger->setFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
         // Set owner guid for target if no owner availble - needed by trigger auras
         // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
         // xinef: set proper orientation, fixes cast against stealthed targets

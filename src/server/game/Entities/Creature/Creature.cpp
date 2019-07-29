@@ -15,6 +15,7 @@
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
+#include "ScriptedGossip.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -428,9 +429,9 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
 
-    SetAttackTime(BASE_ATTACK,   cInfo->baseattacktime);
-    SetAttackTime(OFF_ATTACK,    cInfo->baseattacktime);
-    SetAttackTime(RANGED_ATTACK, cInfo->rangeattacktime);
+    SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
+    SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
+    SetAttackTime(RANGED_ATTACK, cInfo->RangeAttackTime);
 
     SelectLevel(changelevel);
 
@@ -575,6 +576,12 @@ void Creature::Update(uint32 diff)
 
                 // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
                 SelectVictim();
+            }
+
+            Unit* owner = GetCharmerOrOwner();
+            if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+            {
+                RemoveCharmAuras();
             }
 
             if (!IsInEvadeMode() && IsAIEnabled)
@@ -908,12 +915,12 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 
     if (!player->GetBGAccessByLevel(bgTypeId))
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (bgTypeId)
         {
-            case BATTLEGROUND_AV:  player->PlayerTalkClass->SendGossipMenu(7616, GetGUID()); break;
-            case BATTLEGROUND_WS:  player->PlayerTalkClass->SendGossipMenu(7599, GetGUID()); break;
-            case BATTLEGROUND_AB:  player->PlayerTalkClass->SendGossipMenu(7642, GetGUID()); break;
+            case BATTLEGROUND_AV: SendGossipMenuFor(player, 7616, this); break;
+            case BATTLEGROUND_WS: SendGossipMenuFor(player, 7599, this); break;
+            case BATTLEGROUND_AB: SendGossipMenuFor(player, 7642, this); break;
             case BATTLEGROUND_EY:
             case BATTLEGROUND_NA:
             case BATTLEGROUND_BE:
@@ -921,7 +928,7 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
             case BATTLEGROUND_RL:
             case BATTLEGROUND_SA:
             case BATTLEGROUND_DS:
-            case BATTLEGROUND_RV: player->PlayerTalkClass->SendGossipMenu(10024, GetGUID()); break;
+            case BATTLEGROUND_RV: SendGossipMenuFor(player, 10024, this); break;
             default: break;
         }
         return false;
@@ -2816,4 +2823,46 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
 
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
         ClearUnitState(UNIT_STATE_ROTATING);
+}
+
+float Creature::GetAttackDistance(Unit const* player) const
+{
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+
+    if (aggroRate == 0)
+        return 0.0f;
+
+    if (!player)
+        return 0.0f;
+
+    uint32 playerLevel = player->getLevelForTarget(this);
+    uint32 creatureLevel = getLevelForTarget(player);
+
+    int32 levelDiff = static_cast<int32>(playerLevel) - static_cast<int32>(creatureLevel);
+
+    // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
+    if (levelDiff < -25)
+        levelDiff = -25;
+
+    // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
+    float retDistance = 20.0f;
+
+    // "Aggro Radius varies with level difference at a rate of roughly 1 yard/level"
+    // radius grow if playlevel < creaturelevel
+    retDistance -= static_cast<float>(levelDiff);
+
+    if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        // detect range auras
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
+
+        // detected range auras
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
+    }
+
+    // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
+    if (retDistance < 5.0f)
+        retDistance = 5.0f;
+
+    return (retDistance*aggroRate);
 }

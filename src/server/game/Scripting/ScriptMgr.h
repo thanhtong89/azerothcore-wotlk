@@ -20,6 +20,7 @@
 #include "AchievementMgr.h"
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
+#include "GameEventMgr.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -244,6 +245,9 @@ class WorldScript : public ScriptObject
 
         // Called after the world configuration is (re)loaded.
         virtual void OnAfterConfigLoad(bool /*reload*/) { }
+
+        // Called when loading custom database tables
+        virtual void OnLoadCustomDatabaseTable() { }
 
         // Called before the world configuration is (re)loaded.
         virtual void OnBeforeConfigLoad(bool /*reload*/) { }
@@ -774,6 +778,9 @@ class PlayerScript : public ScriptObject
 
     public:
         virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
+        
+        // Called when a player completes a quest
+        virtual void OnPlayerCompleteQuest(Player* /*player*/, Quest const* /*quest_id*/) { }
 
 		// Called when a player kills another player
         virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
@@ -807,6 +814,15 @@ class PlayerScript : public ScriptObject
 
         // Called when a player's reputation changes (before it is actually changed)
         virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
+
+        // Called when a player's reputation rank changes (before it is actually changed)
+        virtual void OnReputationRankChange(Player* /*player*/, uint32 /*factionID*/, ReputationRank /*newRank*/, ReputationRank /*olRank*/, bool /*increased*/) { }
+
+        // Called when a player learned new spell
+        virtual void OnLearnSpell(Player* /*player*/, uint32 /*spellID*/) {}
+
+        // Called when a player forgot spell
+        virtual void OnForgotSpell(Player* /*player*/, uint32 /*spellID*/) {}
 
         // Called when a duel is requested
         virtual void OnDuelRequest(Player* /*target*/, Player* /*challenger*/) { }
@@ -849,7 +865,10 @@ class PlayerScript : public ScriptObject
         virtual void OnCreate(Player* /*player*/) { }
 
         // Called when a player is deleted.
-        virtual void OnDelete(uint64 /*guid*/) { }
+        virtual void OnDelete(uint64 /*guid*/, uint32 /*accountId*/) { }
+
+        // Called when a player delete failed.
+        virtual void OnFailedDelete(uint64 /*guid*/, uint32 /*accountId*/) { }
 
         // Called when a player is about to be saved.
         virtual void OnSave(Player* /*player*/) { }
@@ -939,6 +958,38 @@ class PlayerScript : public ScriptObject
         virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
 
         virtual void OnFirstLogin(Player* /*player*/) { }
+};
+
+class AccountScript : public ScriptObject
+{
+    protected:
+
+        AccountScript(const char* name);
+
+    public:
+
+        // Called when an account logged in successfully
+        virtual void OnAccountLogin(uint32 /*accountId*/) { }
+
+
+        // Called when an account login failed
+        virtual void OnFailedAccountLogin(uint32 /*accountId*/) { }
+
+
+        // Called when Email is successfully changed for Account
+        virtual void OnEmailChange(uint32 /*accountId*/) { }
+
+
+        // Called when Email failed to change for Account
+        virtual void OnFailedEmailChange(uint32 /*accountId*/) { }
+
+
+        // Called when Password is successfully changed for Account
+        virtual void OnPasswordChange(uint32 /*accountId*/) { }
+
+
+        // Called when Password failed to change for Account
+        virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -1059,6 +1110,27 @@ public:
 
     // Add Player in Battlegroud
     virtual void OnBattlegroundAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+
+    // Before added player in Battlegroud
+    virtual void OnBattlegroundBeforeAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+
+    // Remove player at leave BG
+    virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
+};
+
+class SpellSC : public ScriptObject
+{
+protected:
+
+    SpellSC(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Calculate max duration in applying aura 
+    virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
+
 };
 
 // this class can be used to be extended by Modules
@@ -1068,6 +1140,19 @@ class ModuleScript : public ScriptObject
     protected:
 
         ModuleScript(const char* name);
+};
+
+class GameEventScript : public ScriptObject
+{
+protected:
+    GameEventScript(const char* name);
+
+public:
+    // Runs on start event
+    virtual void OnStart(uint16 /*EventID*/) { }
+    
+    // Runs on stop event
+    virtual void OnStop(uint16 /*EventID*/) { }
 };
 
 // Placed here due to ScriptRegistry::AddScript dependency.
@@ -1117,6 +1202,7 @@ class ScriptMgr
 
     public: /* WorldScript */
 
+        void OnLoadCustomDatabaseTable();
         void OnOpenStateChange(bool open);
         void OnBeforeConfigLoad(bool reload);
         void OnAfterConfigLoad(bool reload);
@@ -1262,6 +1348,9 @@ class ScriptMgr
         void OnPlayerMoneyChanged(Player* player, int32& amount);
         void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
         void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
+        void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
+        void OnPlayerLearnSpell(Player* player, uint32 spellID);
+        void OnPlayerForgotSpell(Player* player, uint32 spellID);
         void OnPlayerDuelRequest(Player* target, Player* challenger);
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
@@ -1278,7 +1367,8 @@ class ScriptMgr
         void OnPlayerLogout(Player* player);
         void OnPlayerCreate(Player* player);
         void OnPlayerSave(Player* player);
-        void OnPlayerDelete(uint64 guid);
+        void OnPlayerDelete(uint64 guid, uint32 accountId);
+        void OnPlayerFailedDelete(uint64 guid, uint32 accountId);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
         void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
@@ -1309,6 +1399,16 @@ class ScriptMgr
         void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
         void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
         void OnFirstLogin(Player* player);
+        void OnPlayerCompleteQuest(Player* player, Quest const* quest);
+
+    public: /* AccountScript */
+
+        void OnAccountLogin(uint32 accountId);
+        void OnFailedAccountLogin(uint32 accountId);
+        void OnEmailChange(uint32 accountId);
+        void OnFailedEmailChange(uint32 accountId);
+        void OnPasswordChange(uint32 accountId);
+        void OnFailedPasswordChange(uint32 accountId);
 
     public: /* GuildScript */
 
@@ -1386,6 +1486,17 @@ class ScriptMgr
         void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
         void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
+        void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
+        void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
+
+    public: /* SpellSC */ 
+ 
+        void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
+
+    public: /* GameEventScript */
+
+        void OnGameEventStart(uint16 EventID);
+        void OnGameEventStop(uint16 EventID);
 
     private:
 
