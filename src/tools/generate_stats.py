@@ -10,17 +10,17 @@ expacMultipliers = {
     91: (3, 1.10),
 }
 
-def processStatLine(line):
+def processStatLine(line, idCols):
     tokens = line.split(", ")
-    if len(tokens) < 3:
+    if len(tokens) < idCols+2:
         raise ValueError("Insufficient tokens")
-    lineID = tokens[0]
-    if tokens[1] != "80":
+    lineID = ", ".join(tokens[:idCols])
+    if tokens[idCols] != "80":
         raise ValueError(f"line {line}: second arg must be 80")
 
-    level = int(tokens[1])
+    level = int(tokens[idCols])
     prevStats = []
-    for statToken in tokens[2:]:
+    for statToken in tokens[idCols+1:]:
         try:
             val = int(statToken)
             prevStats.append(val)
@@ -48,8 +48,10 @@ def processStatLine(line):
 
 if __name__ == "__main__":
     # file should contain:
-    # id 80 <stat1> <stat2> ...
+    # id1, <id2>,..., 80 <stat1> <stat2> ...
+    # args: filename idLength (number of cols making up the non-level primary key)
     fname = sys.argv[1]
+    idCols = int(sys.argv[2])
     lines = []
     with open(fname, 'r') as fh:
         lines = fh.readlines()
@@ -63,7 +65,7 @@ if __name__ == "__main__":
             print(f"Skipping line f{line}")
             continue
         parsedLine = m.group(1)
-        result.extend(processStatLine(parsedLine))
+        result.extend(processStatLine(parsedLine, idCols))
     for i, line in enumerate(result):
         term = ","
         if i == len(result) -1 :
