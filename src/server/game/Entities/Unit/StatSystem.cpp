@@ -195,6 +195,23 @@ void Player::UpdateSpellDamageAndHealingBonus()
 {
     // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
+    // For levels beyond wotlk level cap, always apply spellpower bonus
+    uint8 level = getLevel();
+    m_baseSpellPower = 0;
+    if (level > 80) {
+	switch (getClass()) {
+		case CLASS_MAGE:
+		case CLASS_WARLOCK:
+		case CLASS_PRIEST:
+		case CLASS_DRUID:
+		case CLASS_SHAMAN:
+			ApplySpellPowerBonus(1.45 * GetStat(STAT_INTELLECT), true);
+		break;
+		default:
+			ApplySpellPowerBonus(1.25 * GetStat(STAT_INTELLECT), true);
+
+	}
+    }
     // Get healing bonus for all schools
     SetStatInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL));
     // Get damage bonus for all schools
@@ -946,6 +963,11 @@ void Player::UpdateManaRegen()
     }
 
     float Intellect = GetStat(STAT_INTELLECT);
+    float Spirit = GetStat(STAT_SPIRIT);
+    uint8 level = getLevel();
+    if (level > 80) {
+        m_baseManaRegen = 250 + .2 * (Spirit + Intellect);
+    }
     // Mana regen from spirit and intellect
     float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
