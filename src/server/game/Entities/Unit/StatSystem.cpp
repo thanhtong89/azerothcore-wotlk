@@ -852,8 +852,8 @@ void Player::UpdateDodgePercentage()
     }
     // cap melee crit for levels > 80
     uint8 level = getLevel();
-    if (level > 80 && value > 70f)
-	value = 70f;
+    if (level > 80 && value > 70.0f)
+	value = 70.0f;
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
