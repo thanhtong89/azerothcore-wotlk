@@ -3,7 +3,7 @@
 
 tmpfile=$(mktemp /tmp/pet_levelstats.sql80.XXX)
 grep -Eo "\([0-9]+, 80, .*" ../../base/db_world/pet_levelstats.sql > $tmpfile
-data=$(../../../../src/tools/generate_stats.py $tmpfile 1)
+data=$(./generate_stats.py $tmpfile 1)
 
 template=$(cat << TT
 ALTER TABLE pet_levelstats MODIFY COLUMN  hp INT unsigned;
