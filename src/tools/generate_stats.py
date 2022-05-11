@@ -5,8 +5,10 @@ import sys
 maxLevel = 100
 # expac -> (prevExpacMult, interLevelMult)
 expacMultipliers = {
-    81: (3, 1.15),
-    86: (3, 1.15),
+    81: (3, 1.2),
+    85: (2, 1.2),
+    86: (3, 1.2),
+    90: (2, 1.10),
     91: (3, 1.10),
 }
 
