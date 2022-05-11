@@ -58,11 +58,9 @@ if __name__ == "__main__":
     pattern = re.compile(".*\((.+)\)")
     result = []
     for line in lines:
-        print(f"--- processing line {line} ---")
         # strip all parens and trailing comma
         m = pattern.match(line)
         if m is None:
-            print(f"Skipping line f{line}")
             continue
         parsedLine = m.group(1)
         result.extend(processStatLine(parsedLine, idCols))
