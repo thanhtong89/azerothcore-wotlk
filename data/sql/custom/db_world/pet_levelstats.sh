@@ -1,9 +1,10 @@
 #!/bin/bash
 # Generate pet_levelstats.sql custom SQL with level81-100 support
 
+mults="81:3-1.2,86:3-1.2,91:3-1.2"
 tmpfile=$(mktemp /tmp/pet_levelstats.sql80.XXX)
 grep -Eo "\([0-9]+, 80, .*" ../../base/db_world/pet_levelstats.sql > $tmpfile
-data=$(./generate_stats.py $tmpfile 1)
+data=$(./generate_stats.py $tmpfile 1 "${mults}")
 
 template=$(cat << TT
 ALTER TABLE pet_levelstats MODIFY COLUMN  hp INT unsigned;
