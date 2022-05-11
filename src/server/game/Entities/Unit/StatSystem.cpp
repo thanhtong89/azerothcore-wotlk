@@ -850,6 +850,10 @@ void Player::UpdateDodgePercentage()
     {
         value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
     }
+    // cap melee crit for levels > 80
+    uint8 level = getLevel();
+    if (level > 80 && value > 70f)
+	value = 70f;
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
