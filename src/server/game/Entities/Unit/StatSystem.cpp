@@ -832,6 +832,11 @@ void Player::UpdateDodgePercentage()
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
     GetDodgeFromAgility(diminishing, nondiminishing);
+    // cap dodge for nondiminishing for levels > 80
+    uint8 level = getLevel();
+    if (level > 80 && nondiminishing > 20.0f)
+	nondiminishing = 20.0f;
+
     // Modify value from defense skill (only bonus from defense rating diminishes)
     nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;
     diminishing += (int32(GetRatingBonusValue(CR_DEFENSE_SKILL))) * 0.04f;
@@ -850,10 +855,6 @@ void Player::UpdateDodgePercentage()
     {
         value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
     }
-    // cap melee crit for levels > 80
-    uint8 level = getLevel();
-    if (level > 80 && value > 70.0f)
-	value = 70.0f;
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
