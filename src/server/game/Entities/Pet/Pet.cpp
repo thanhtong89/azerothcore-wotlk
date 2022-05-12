@@ -1441,11 +1441,6 @@ bool Pet::HaveInDiet(ItemTemplate const* item) const
 
 uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
 {
-    // if pet's level is higher than 80, assume lowest benefit, but still makes it possible
-    // to feed the pet
-    if (getLevel() > 80)
-	return 8000;
-
     // -5 or greater food level
     if (GetLevel() <= itemlevel + 5)                         //possible to feed level 60 pet with level 55 level food for full effect
         return 35000;
@@ -1457,6 +1452,11 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
         return 8000;
     // -15 or less
     else
+        // if pet's level is higher than 80, still makes it possible to feed it,
+        // but scales the happiness gained
+        if (getLevel() > 80)
+            return ceil(120000 * 1.0f / (getLevel() - itemlevel));
+
         return 0;                                           //food too low level
 }
 
