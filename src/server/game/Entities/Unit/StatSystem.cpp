@@ -793,6 +793,12 @@ void Player::UpdateParryPercentage()
         float nondiminishing  = 5.0f;
         // Parry from rating
         float diminishing = GetRatingBonusValue(CR_PARRY);
+        // in case we have abilities that increase parry rating by too much, cap it for high level
+        uint8 level = getLevel();
+        if (level > 80 && diminishing > parry_cap[pclass]) {
+            diminishing = parry_cap[pclass];
+        }
+
         // Modify value from defense skill (only bonus from defense rating diminishes)
         nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;
         diminishing += (int32(GetRatingBonusValue(CR_DEFENSE_SKILL))) * 0.04f;
