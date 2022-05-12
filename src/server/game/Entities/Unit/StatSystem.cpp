@@ -832,10 +832,6 @@ void Player::UpdateDodgePercentage()
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
     GetDodgeFromAgility(diminishing, nondiminishing);
-    // cap dodge for nondiminishing for levels > 80
-    uint8 level = getLevel();
-    if (level > 80 && nondiminishing > 20.0f)
-	nondiminishing = 20.0f;
 
     // Modify value from defense skill (only bonus from defense rating diminishes)
     nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;

@@ -5101,7 +5101,7 @@ float Player::GetMeleeCritFromAgility()
     float crit = critBase->base + GetStat(STAT_AGILITY) * critRatio->ratio;
     // cap melee crit for levels > 80
     if (level > 80 && crit > .70f)
-	crit = .70f;
+        crit = .70f;
 
     return crit * 100.0f;
 }
@@ -5157,6 +5157,9 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
     diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1];
     nondiminishing = 100.0f * (dodge_base[pclass - 1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1]);
+    // cap dodge for nondiminishing for levels > 80
+    if (level > 80 && nondiminishing > 20.0f)
+        nondiminishing = 20.0f;
 }
 
 float Player::GetSpellCritFromIntellect()
@@ -5176,7 +5179,7 @@ float Player::GetSpellCritFromIntellect()
 
     // cap melee crit for levels > 80
     if (level > 80 && crit > .70f)
-	crit = .70f;
+        crit = .70f;
 
     return crit * 100.0f;
 }
@@ -12675,7 +12678,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
     // To make certain game mechanics possible (e.g. getting soul shards) when playing
     // at levels greater than 80, we make this check always pass
     if (getLevel() > 80)
-	return true;
+        return true;
 
     // Victim level less gray level
     if (v_level <= k_grey)
