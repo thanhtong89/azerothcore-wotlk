@@ -17619,6 +17619,9 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget, uint32 spell_id)
     }
 
     uint8 level = creatureTarget->GetLevel() + 5 < GetLevel() ? (GetLevel() - 5) : creatureTarget->GetLevel();
+    // if player level is > 80, just set pet level at the same
+    if (GetLevel() > 80)
+        level = GetLevel();
 
     if (!InitTamedPet(pet, level, spell_id))
     {
