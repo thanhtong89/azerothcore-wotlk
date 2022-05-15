@@ -5177,9 +5177,9 @@ float Player::GetSpellCritFromIntellect()
 
     float crit = critBase->base + GetStat(STAT_INTELLECT) * critRatio->ratio;
 
-    // cap melee crit for levels > 80
-    if (level > 80 && crit > .70f)
-        crit = .70f;
+    // cap intellect crit for levels > 80
+    if (level > 80 && crit > .30f)
+        crit = .30f;
 
     return crit * 100.0f;
 }

@@ -697,9 +697,13 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
             cr = CR_CRIT_MELEE;
             break;
     }
+    // limit rating bonus here in case it gets too big for high level players
+    float ratingBonus = GetRatingBonusValue(cr);
+    if (getLevel() > 80 && ratingBonus > 30.0f)
+        ratingBonus = 30.0f;
 
     // flat = bonus from crit auras, pct = bonus from agility, combat rating = mods from items
-    float value = GetBaseModValue(modGroup, FLAT_MOD) + GetBaseModValue(modGroup, PCT_MOD) + GetRatingBonusValue(cr);
+    float value = GetBaseModValue(modGroup, FLAT_MOD) + GetBaseModValue(modGroup, PCT_MOD) + ratingBonus;
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
 
@@ -879,8 +883,14 @@ void Player::UpdateSpellCritChance(uint32 school)
     crit += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_PCT);
     // Increase crit by school from SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL
     crit += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, 1 << school);
+
     // Increase crit from spell crit ratings
-    crit += GetRatingBonusValue(CR_CRIT_SPELL);
+    float critRatingBonus = GetRatingBonusValue(CR_CRIT_SPELL);
+
+    // in case of abilities that scale crit too high for high level players, limit it
+    if (getLevel() > 80 && critRatingBonus > 35.0f)
+        critRatingBonus = 35.0f;
+    crit += critRatingBonus;
 
     // Store crit value
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
