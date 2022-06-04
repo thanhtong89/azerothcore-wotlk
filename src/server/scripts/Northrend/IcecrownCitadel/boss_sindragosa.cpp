@@ -406,6 +406,13 @@ public:
             if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
                 return;
 
+            int playerCount = 0;
+            const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                if (Player* p = itr->GetSource())
+                    if (p->IsAlive() && !p->IsGameMaster())
+                        playerCount++;
+
             switch (point)
             {
                 case POINT_FROSTWYRM_LAND:
@@ -422,7 +429,9 @@ public:
                     events.ScheduleEvent(EVENT_AIR_MOVEMENT, 0ms);
                     break;
                 case POINT_AIR_PHASE:
-                    me->CastCustomSpell(SPELL_ICE_TOMB_TARGET, SPELLVALUE_MAX_TARGETS, RAID_MODE<int32>(2, 5, 2, 6), nullptr);
+                    // do not cast ice tomb if soloing
+                    if (playerCount > 1)
+                        me->CastCustomSpell(SPELL_ICE_TOMB_TARGET, SPELLVALUE_MAX_TARGETS, RAID_MODE<int32>(2, 5, 2, 6), nullptr);
                     me->SetFacingTo(float(M_PI));
                     events.ScheduleEvent(EVENT_AIR_MOVEMENT_FAR, 0ms); // won't be processed during cast time anyway, so 0
                     events.ScheduleEvent(EVENT_FROST_BOMB, 7s);
