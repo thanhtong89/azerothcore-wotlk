@@ -2398,7 +2398,6 @@ void Pet::SynchronizeLevelWithOwner()
             break;
         // can't be greater owner level
         case HUNTER_PET:
-<<<<<<< HEAD
             if (owner->GetLevel() > 80)
                 GivePetLevel(owner->GetLevel());
             else if (GetLevel() > owner->GetLevel())
