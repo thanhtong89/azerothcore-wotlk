@@ -12,7 +12,7 @@ hp_data=$(./generate_stats.py "$hp_tmpfile" 1 "${hp_mults}" | sed '$ s/;$//')
 rm -f "$hp_tmpfile"
 
 # --- Pass 2: Strength, Agility, Stamina, Intellect, Spirit ---
-attr_mults="81:3-1.2,85:4-1,86:3-1.2,90:4-1,91:2-1.1,100:1.6-1"
+attr_mults="81:6-1.2,85:4-1,86:3-1.2,90:4-1,91:2-1.1,100:1.6-1"
 attr_tmpfile=$(mktemp /tmp/player_class_stats_attr.sql80.XXX)
 # Extract (Class, 80, Str, Agi, Sta, Int, Spi) from rows like (1,80,8121,0,174,113,159,36,59)
 grep -Eo "\([0-9]+,80,[^)]*\)" "$basefile" | sed -E 's/\(([0-9]+),80,[0-9]+,[0-9]+,([0-9]+),([0-9]+),([0-9]+),([0-9]+),([0-9]+)\)/(\1, 80, \2, \3, \4, \5, \6)/' > "$attr_tmpfile"
