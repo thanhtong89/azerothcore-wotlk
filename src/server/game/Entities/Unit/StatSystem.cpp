@@ -196,7 +196,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
     // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
     // This information for client side use only
     // For levels beyond wotlk level cap, always apply spellpower bonus
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     m_baseSpellPower = 0;
     if (level > 80) {
 	switch (getClass()) {
@@ -699,7 +699,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     }
     // limit rating bonus here in case it gets too big for high level players
     float ratingBonus = GetRatingBonusValue(cr);
-    if (getLevel() > 80 && ratingBonus > 30.0f)
+    if (GetLevel() > 80 && ratingBonus > 30.0f)
         ratingBonus = 30.0f;
 
     // flat = bonus from crit auras, pct = bonus from agility, combat rating = mods from items
@@ -798,7 +798,7 @@ void Player::UpdateParryPercentage()
         // Parry from rating
         float diminishing = GetRatingBonusValue(CR_PARRY);
         // in case we have abilities that increase parry rating by too much, cap it for high level
-        uint8 level = getLevel();
+        uint8 level = GetLevel();
         if (level > 80 && diminishing > parry_cap[pclass]) {
             diminishing = parry_cap[pclass];
         }
@@ -888,7 +888,7 @@ void Player::UpdateSpellCritChance(uint32 school)
     float critRatingBonus = GetRatingBonusValue(CR_CRIT_SPELL);
 
     // in case of abilities that scale crit too high for high level players, limit it
-    if (getLevel() > 80 && critRatingBonus > 35.0f)
+    if (GetLevel() > 80 && critRatingBonus > 35.0f)
         critRatingBonus = 35.0f;
     crit += critRatingBonus;
 
@@ -981,7 +981,7 @@ void Player::UpdateManaRegen()
 
     float Intellect = GetStat(STAT_INTELLECT);
     float Spirit = GetStat(STAT_SPIRIT);
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     if (level > 80) {
         m_baseManaRegen = 250 + .2 * (Spirit + Intellect);
     }

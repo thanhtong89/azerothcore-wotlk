@@ -1454,8 +1454,8 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
     else
         // if pet's level is higher than 80, still makes it possible to feed it,
         // but scales the happiness gained
-        if (getLevel() > 80)
-            return ceil(120000 * 1.0f / (getLevel() - itemlevel));
+        if (GetLevel() > 80)
+            return ceil(120000 * 1.0f / (GetLevel() - itemlevel));
 
         return 0;                                           //food too low level
 }

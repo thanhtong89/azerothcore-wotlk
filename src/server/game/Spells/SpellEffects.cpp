@@ -3121,8 +3121,8 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     uint8 level = (creatureTarget->GetLevel() < (m_caster->GetLevel() - 5)) ? (m_caster->GetLevel() - 5) : creatureTarget->GetLevel();
 
     // modify pet level to be same as caster if caster's level is > 80
-    if (m_caster->getLevel() > 80)
-        level = m_caster->getLevel();
+    if (m_caster->GetLevel() > 80)
+        level = m_caster->GetLevel();
 
     // prepare visual effect for levelup
     pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);

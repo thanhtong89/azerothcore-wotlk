@@ -12677,7 +12677,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
 
     // To make certain game mechanics possible (e.g. getting soul shards) when playing
     // at levels greater than 80, we make this check always pass
-    if (getLevel() > 80)
+    if (GetLevel() > 80)
         return true;
 
     // Victim level less gray level
