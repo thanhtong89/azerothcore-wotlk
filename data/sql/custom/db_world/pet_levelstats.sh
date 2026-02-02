@@ -3,7 +3,7 @@
 
 mults="81:3-1.2,85:2-1,86:3-1.2,90:2-1,91:2-1.1,100:1.6-1"
 tmpfile=$(mktemp /tmp/pet_levelstats.sql80.XXX)
-grep -Eo "\([0-9]+, 80, .*" ../../base/db_world/pet_levelstats.sql > $tmpfile
+grep -Eo "\([0-9]+,80,[^)]*\)" ../../base/db_world/pet_levelstats.sql | sed 's/,/, /g' > $tmpfile
 data=$(./generate_stats.py $tmpfile 1 "${mults}")
 
 template=$(cat << TT
